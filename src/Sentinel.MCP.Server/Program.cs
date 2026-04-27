@@ -1,4 +1,4 @@
-using AgentToolbox.Tools;
+using Sentinel.MCP.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -23,7 +23,7 @@ builder.Services.Configure<McpServerOptions>(options =>
 {
     options.ServerInfo = new Implementation
     {
-        Name = builder.Configuration["McpServer:Name"] ?? "AgentToolbox",
+        Name = builder.Configuration["McpServer:Name"] ?? "Sentinel.MCP",
         Version = builder.Configuration["McpServer:Version"] ?? "1.0.0"
     };
 });

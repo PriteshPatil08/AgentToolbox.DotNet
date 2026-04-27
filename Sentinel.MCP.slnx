@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Sentinel.MCP.Client/Sentinel.MCP.Client.csproj" />
+    <Project Path="src/Sentinel.MCP.Contracts/Sentinel.MCP.Contracts.csproj" />
+    <Project Path="src/Sentinel.MCP.Server/Sentinel.MCP.Server.csproj" />
+    <Project Path="src/Sentinel.MCP.Tools/Sentinel.MCP.Tools.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Sentinel.MCP.Integration.Tests/Sentinel.MCP.Integration.Tests.csproj" />
+    <Project Path="tests/Sentinel.MCP.Tools.Tests/Sentinel.MCP.Tools.Tests.csproj" />
+  </Folder>
+</Solution>

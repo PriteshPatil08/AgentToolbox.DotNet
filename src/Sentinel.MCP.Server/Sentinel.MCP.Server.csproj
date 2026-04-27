@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AgentToolbox.Tools\AgentToolbox.Tools.csproj" />
+    <ProjectReference Include="..\Sentinel.MCP.Tools\Sentinel.MCP.Tools.csproj" />
   </ItemGroup>
 
 </Project>

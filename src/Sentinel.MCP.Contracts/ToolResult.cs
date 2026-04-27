@@ -1,4 +1,4 @@
-namespace AgentToolbox.Tools.Contracts;
+namespace Sentinel.MCP.Contracts;
 
 public sealed class ToolResult<T> : IToolResult<T>
 {

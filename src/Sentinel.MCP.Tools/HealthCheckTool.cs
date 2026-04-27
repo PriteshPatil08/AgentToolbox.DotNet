@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using AgentToolbox.Tools.Contracts;
+using Sentinel.MCP.Contracts;
 using ModelContextProtocol.Server;
 
-namespace AgentToolbox.Tools;
+namespace Sentinel.MCP.Tools;
 
 [McpServerToolType]
 public sealed class HealthCheckTool

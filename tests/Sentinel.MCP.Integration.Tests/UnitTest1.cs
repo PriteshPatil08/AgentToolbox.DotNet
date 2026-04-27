@@ -1,4 +1,4 @@
-﻿namespace AgentToolbox.Integration.Tests;
+﻿namespace Sentinel.MCP.Integration.Tests;
 
 public class UnitTest1
 {

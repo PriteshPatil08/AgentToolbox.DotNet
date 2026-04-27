@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\AgentToolbox.Tools.Contracts\AgentToolbox.Tools.Contracts.csproj" />
+    <ProjectReference Include="..\Sentinel.MCP.Contracts\Sentinel.MCP.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
