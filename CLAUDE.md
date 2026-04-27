@@ -68,7 +68,12 @@ The goal is that the user understands *why* every line exists before it's writte
 
 ## Bash Commands
 
-After every Bash command, follow it with a one-line plain-English explanation of what that command did and what its output means.
+After every Bash command, follow it with:
+
+1. **What it did** — one plain-English sentence on what the command did and what its output means.
+2. **Flag breakdown** — a brief explanation of every flag used (e.g. `-X PATCH`, `--jq`, `-f`). Skip if the command has no flags.
+3. **PowerShell equivalent** — the exact command rewritten for PowerShell.
+4. **CMD equivalent** — the exact command rewritten for Windows Command Prompt. If no direct equivalent exists, say so and explain why.
 
 ---
 
