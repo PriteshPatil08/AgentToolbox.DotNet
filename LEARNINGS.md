@@ -97,3 +97,29 @@
 - `[]` — collection expression syntax (net9+/net10)
 - Static factory methods — `Ok` / `Fail` enforce valid object state at construction
 - `DateTime.UtcNow` on every result — telemetry-ready from day one
+
+---
+
+## Step 3 (Part 2) — HealthCheckTool Implementation
+
+> `Stopwatch` uses the CPU's monotonic performance counter — it never jumps, never goes backward, and is never adjusted by NTP; `DateTime` subtraction can produce negative or wildly wrong durations mid-flight.
+> `CancellationTokenSource.CreateLinkedTokenSource` wires the caller's token and the tool's timeout together — either fires the cancellation; the `when (!cancellationToken.IsCancellationRequested)` guard distinguishes timeout from clean shutdown.
+> `[McpServerTool]` + `[Description]` on method and parameters is the schema the LLM reads — every word is AI-facing documentation, not developer-facing.
+
+**Technical Topics**
+- `[McpServerToolType]` / `[McpServerTool]` — MCP SDK tool registration via attributes
+- `[Description]` on method and parameters — LLM-facing schema documentation
+- `System.ComponentModel.DescriptionAttribute` — separate from `McpServerTool`, placed on method
+- `IHttpClientFactory` — injected instead of `HttpClient`, enables named clients
+- Named HTTP clients — `AddHttpClient("name")` + `ConfigurePrimaryHttpMessageHandler`
+- `HttpClientHandler.AllowAutoRedirect` — per-client redirect behaviour
+- `Stopwatch` vs `DateTime` — monotonic counter vs wall clock, NTP jump risk
+- `CancellationTokenSource.CreateLinkedTokenSource` — composing caller + timeout cancellation
+- `cts.CancelAfter` — timeout without blocking a thread
+- `catch when (!cancellationToken.IsCancellationRequested)` — routing timeout vs shutdown
+- `HttpRequestError` enum (.NET 8+) — `NameResolutionError`, `SecureConnectionError`
+- CA1054 — `string` URL parameters should be `Uri`
+- CA2234 — prefer `HttpClient.GetAsync(Uri)` over `GetAsync(string)`
+- `#pragma warning disable CA1031` — deliberate broad catch, suppressed locally not globally
+- `is >= 200 and < 300` — C# 9 relational pattern matching
+- `.WithTools<T>()` — registering a tool type with the MCP server builder
