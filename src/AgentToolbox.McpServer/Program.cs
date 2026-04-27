@@ -1,3 +1,4 @@
+using AgentToolbox.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,9 +10,14 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.Logging.AddConsole(options =>
     options.LogToStandardErrorThreshold = LogLevel.Trace);
 
+builder.Services.AddHttpClient("HealthCheck.Follow");
+builder.Services.AddHttpClient("HealthCheck.NoFollow")
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+
 builder.Services
     .AddMcpServer()
-    .WithStdioServerTransport();
+    .WithStdioServerTransport()
+    .WithTools<HealthCheckTool>();
 
 builder.Services.Configure<McpServerOptions>(options =>
 {
