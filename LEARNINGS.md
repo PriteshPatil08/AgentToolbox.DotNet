@@ -123,3 +123,25 @@
 - `#pragma warning disable CA1031` — deliberate broad catch, suppressed locally not globally
 - `is >= 200 and < 300` — C# 9 relational pattern matching
 - `.WithTools<T>()` — registering a tool type with the MCP server builder
+
+---
+
+## Step 4 — InspectSSLCertificate Tool
+
+> `TcpClient` + `SslStream` gives direct socket-level TLS access — no `HttpClient` abstraction, full control over the handshake and the raw certificate before any trust decision is made.
+> C# exception filters (`when`) let you branch on exception properties without catching and rethrowing — the stack unwinds only if the filter matches, keeping the error path clean and the original stack trace intact.
+> Structured error returns (`ToolResult.Fail`) keep the MCP host alive and give the LLM actionable failure information — a typed `ToolErrorCode` is something the agent can reason about; a stack trace is not.
+
+**Technical Topics**
+- `TcpClient` + `SslStream` — raw TLS client without `HttpClient`
+- `SslClientAuthenticationOptions` — `TargetHost`, `EnabledSslProtocols`, `CertificateRevocationCheckMode`
+- `SslProtocols.None` — defers TLS version selection to the OS policy
+- `RemoteCertificateValidationCallback` — intercepts chain validation without blocking the connection
+- `X509Certificate2` / `X509CertificateLoader` — cert parsing, field extraction, export
+- `X509SubjectAlternativeNameExtension.EnumerateDnsNames()` — SAN extraction in .NET 10
+- `cert.NotAfter.ToUniversalTime()` — UTC-normalised expiry comparison
+- `SocketException.SocketErrorCode` — `HostNotFound`, `NoData`, `ConnectionRefused`
+- `AuthenticationException` — TLS handshake failure (self-signed, protocol mismatch, OS rejection)
+- `catch (T ex) when (condition)` — exception filters, stack unwind only on match
+- `CA5359` — suppressing "do not disable certificate validation" for intentional inspection tools
+- `CA1031` — suppressing broad `Exception` catch at tool boundaries
