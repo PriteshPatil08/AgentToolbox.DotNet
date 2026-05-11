@@ -1,11 +1,12 @@
-using Anthropic.SDK;
-using Anthropic.SDK.Common;
-using Anthropic.SDK.Constants;
+using Anthropic;
+using Anthropic.Core;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Client;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Configuration.AddUserSecrets<Program>(optional: true);
 var apiKey = builder.Configuration["Anthropic:ApiKey"]
     ?? throw new InvalidOperationException("Anthropic:ApiKey not set in user-secrets.");
 
@@ -15,15 +16,21 @@ await using var mcpClient = await McpClient.CreateAsync(
     {
         Command = "dotnet",
         Arguments = ["run", "--project", "src/Sentinel.MCP.Server", "--no-launch-profile"],
+        WorkingDirectory = Directory.GetCurrentDirectory(),
         Name = "Sentinel"
     })).ConfigureAwait(false);
 #pragma warning restore CA2007
 
 var tools = await mcpClient.ListToolsAsync().ConfigureAwait(false);
 
-using var anthropicClient = new AnthropicClient(new APIAuthentication(apiKey));
-IChatClient chatClient = anthropicClient
-    .Messages
+Environment.SetEnvironmentVariable("ANTHROPIC_API_KEY", apiKey);
+
+#pragma warning disable CA2000 // AnthropicClient does not implement IDisposable
+AnthropicClient anthropicClient = new();
+#pragma warning restore CA2000
+
+using IChatClient chatClient = anthropicClient
+    .AsIChatClient("claude-sonnet-4-5-20250929")
     .AsBuilder()
     .UseFunctionInvocation()
     .Build();
@@ -54,15 +61,13 @@ while (true)
         history,
         new ChatOptions
         {
-            ModelId = AnthropicModels.Claude46Sonnet,
             MaxOutputTokens = 4096,
             Tools = [.. tools]
         }).ConfigureAwait(false);
 
-    var reply = response.Text ?? "(no response)";
-    history.Add(response.Messages[^1]);
+    history.AddRange(response.Messages);
 
     Console.WriteLine();
-    Console.WriteLine(reply);
+    Console.WriteLine(response.Text ?? "(no response)");
     Console.WriteLine();
 }
