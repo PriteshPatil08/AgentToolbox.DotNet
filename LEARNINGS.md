@@ -145,3 +145,39 @@
 - `catch (T ex) when (condition)` — exception filters, stack unwind only on match
 - `CA5359` — suppressing "do not disable certificate validation" for intentional inspection tools
 - `CA1031` — suppressing broad `Exception` catch at tool boundaries
+
+---
+
+## Step 5.1 — Packages, Configuration & MCP Client
+
+> `McpClient.CreateAsync` with `StdioClientTransport` spawns the server as a child process and manages the JSON-RPC pipe — your client becomes the parent and the server's lifetime is tied to it.
+> `ListToolsAsync()` returns `IList<McpClientTool>`, which already implements `AITool` — MEA can use it directly without any wrapping.
+> API keys belong in user-secrets during development — `AddUserSecrets<Program>(optional: true)` loads them without touching `appsettings.json` or the environment.
+
+**Technical Topics**
+- `McpClient.CreateAsync` / `StdioClientTransport` — spawning an MCP server as a managed child process
+- `StdioClientTransportOptions` — `Command`, `Arguments`, `WorkingDirectory`, `Name`
+- `ListToolsAsync()` — discovers server tools as MEA-compatible `AITool` objects
+- `IConfiguration` + `AddUserSecrets<T>` — secret management via .NET user-secrets store
+- `?? throw new InvalidOperationException(...)` — fail-fast null guard on required config
+- `CA2007` / `ConfigureAwait(false)` — async best practice for library-style code
+- `await using` — `IAsyncDisposable` on the MCP client; disposes the child process on exit
+
+---
+
+## Step 5.2 — LLM Chat Loop with Claude
+
+> `UseFunctionInvocation()` is MEA middleware — it intercepts `tool_use` responses from Claude, calls the matching `AIFunction`, injects the result, and re-prompts automatically; you never write the dispatch loop yourself.
+> `history.AddRange(response.Messages)` preserves the full multi-turn context including tool call and tool result turns — Claude needs that context to synthesise the final answer correctly.
+> Package identity matters: `Anthropic.SDK` (third-party, NuGet) and `Anthropic` (official Anthropic .NET SDK) are two completely different packages with incompatible APIs — a binary incompatibility between `Anthropic.SDK` 5.10.0 and `ModelContextProtocol.Core` 1.2.0 (MEA.Abstractions version clash) forced a switch to the official SDK.
+
+**Technical Topics**
+- `AnthropicClient.AsIChatClient("model-id")` — adapts official SDK to MEA `IChatClient`
+- `IChatClientBuilder.UseFunctionInvocation()` — automatic tool-dispatch middleware
+- `IChatClient.GetResponseAsync(history, ChatOptions)` — stateless send; caller manages history
+- `ChatMessage` / `ChatRole.User` / `ChatRole.Assistant` — MEA conversation message types
+- `ChatOptions.Tools` — passes `IList<AITool>` (the MCP tools) into each request
+- `List<ChatMessage>` as conversation history — append user turn, then `AddRange(response.Messages)`
+- `response.Text` — convenience property extracting the final text content from the response
+- MEA.Abstractions version conflict — binary incompatibility when two packages target different MEA versions
+- `Anthropic.SDK` vs `Anthropic` (official) — third-party vs official .NET SDK, different APIs and MEA compatibility
