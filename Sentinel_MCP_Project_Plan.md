@@ -1,4 +1,4 @@
-# AgentToolbox.DotNet — Detailed Project Plan
+# Sentinel.MCP — Detailed Project Plan
 
 ## AI-Powered API Health Monitor & Diagnostics Platform
 
