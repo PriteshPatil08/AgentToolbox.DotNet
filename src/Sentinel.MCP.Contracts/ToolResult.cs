@@ -1,11 +1,24 @@
+using System.Text.Json.Serialization;
+
 namespace Sentinel.MCP.Contracts;
 
 public sealed class ToolResult<T> : IToolResult<T>
 {
+    [JsonPropertyName("success")]
     public bool Success { get; init; }
+
+    [JsonPropertyName("data")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public T? Data { get; init; }
-    public ToolError? Failure { get; init; }
+
+    [JsonPropertyName("error")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ToolError? Error { get; init; }
+
+    [JsonPropertyName("executedAtUtc")]
     public DateTime ExecutedAtUtc { get; init; }
+
+    [JsonPropertyName("durationMs")]
     public long DurationMs { get; init; }
 }
 
@@ -22,7 +35,7 @@ public static class ToolResult
     public static ToolResult<T> Fail<T>(ToolError error, long durationMs) => new()
     {
         Success = false,
-        Failure = error,
+        Error = error,
         ExecutedAtUtc = DateTime.UtcNow,
         DurationMs = durationMs
     };

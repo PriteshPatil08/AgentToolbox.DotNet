@@ -1,14 +1,18 @@
-using Sentinel.MCP.Tools;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
+using Sentinel.MCP.Contracts;
+using Sentinel.MCP.Tools;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Logging.AddConsole(options =>
     options.LogToStandardErrorThreshold = LogLevel.Trace);
+
+builder.Services.AddValidatorsFromAssemblyContaining<HealthCheckRequestValidator>();
 
 builder.Services.AddHttpClient("HealthCheck.Follow");
 builder.Services.AddHttpClient("HealthCheck.NoFollow")
